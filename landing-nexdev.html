@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NEXDEV — Ingeniería Digital de Alto Rendimiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:       #030609;
+  --deep:      #060b14;
+  --navy:      #091120;
+  --card:      #0c1526;
+  --lift:      #111e32;
+  --rim:       rgba(120,160,220,0.12);
+  --rim-s:     rgba(120,160,220,0.06);
+
+  --gold:      #c8a46a;
+  --gold-lt:   #e0c28a;
+  --gold-dim:  rgba(200,164,106,0.1);
+  --gold-glow: rgba(200,164,106,0.22);
+
+  --azure:     #4e8ef7;
+  --azure-dim: rgba(78,142,247,0.1);
+
+  --txt:       #aabbcc;
+  --muted:     #445566;
+  --faint:     #1a2a3a;
+
+  --wa:        #25d366;
+  --tg:        #2aabee;
+
+  --r4:  4px;
+  --r8:  8px;
+  --r12: 12px;
+  --r16: 16px;
+  --r20: 20px;
+  --r99: 100px;
+}
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--ink);
+  color: var(--txt);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+button { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+
+/* ═══════════════════════════════════════════
+   BACKGROUND LAYERS
+═══════════════════════════════════════════ */
+#bg-mesh {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 90% 60% at 15% 5%,  rgba(78,142,247,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 70% at 85% 90%, rgba(200,164,106,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 40%, rgba(78,142,247,0.03) 0%, transparent 50%);
+}
+#bg-dots {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(120,160,220,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 40%, transparent 80%);
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 40%, transparent 80%);
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(20px, 5vw, 72px);
+  background: rgba(3,6,9,0.8);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border-bottom: 1px solid var(--rim);
+  transition: background 0.3s;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-logo-mark {
+  width: 32px; height: 32px; border-radius: var(--r8);
+  background: linear-gradient(135deg, var(--gold), var(--azure));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px; font-weight: 900; color: var(--ink);
+  flex-shrink: 0;
+}
+.nav-logo-name {
+  font-size: 16px; font-weight: 800;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: #e8f0ff;
+}
+.nav-logo-name span { color: var(--gold); }
+
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+.nav-links a {
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  letter-spacing: 0.3px; transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+  height: 1px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+}
+.nav-links a:hover { color: #e8f0ff; }
+.nav-links a:hover::after { transform: scaleX(1); }
+
+.nav-end { display: flex; align-items: center; gap: 8px; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--r99);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.3px;
+  border: 1px solid transparent; transition: all 0.2s; cursor: pointer;
+}
+.pill-wa  { background: rgba(37,211,102,0.1); border-color: rgba(37,211,102,0.2); color: var(--wa); }
+.pill-wa:hover { background: rgba(37,211,102,0.18); }
+.pill-tg  { background: rgba(42,171,238,0.1); border-color: rgba(42,171,238,0.2); color: var(--tg); }
+.pill-tg:hover { background: rgba(42,171,238,0.18); }
+
+.btn-cta {
+  padding: 8px 20px; border-radius: var(--r8);
+  background: var(--gold); color: var(--ink);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+  border: none; cursor: pointer; transition: all 0.22s;
+  box-shadow: 0 4px 18px var(--gold-glow);
+}
+.btn-cta:hover { background: var(--gold-lt); transform: translateY(-1px); box-shadow: 0 8px 28px rgba(200,164,106,0.38); }
+
+#hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 4px;
+}
+#hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--txt); border-radius: 2px; transition: all 0.3s;
+}
+#hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+#hamburger.open span:nth-child(2) { opacity: 0; }
+#hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+#mobile-menu {
+  display: none; flex-direction: column; gap: 0;
+  position: fixed; top: 64px; left: 0; right: 0; z-index: 499;
+  background: rgba(6,11,20,0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--rim);
+  padding: 16px 24px 24px;
+  transform: translateY(-20px); opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+#mobile-menu.open { display: flex; transform: translateY(0); opacity: 1; }
+#mobile-menu a {
+  padding: 14px 0; border-bottom: 1px solid var(--rim-s);
+  font-size: 15px; font-weight: 500; color: var(--txt);
+}
+#mobile-menu a:last-child { border-bottom: none; }
+.mob-channels { display: flex; gap: 10px; margin-top: 16px; }
+.mob-channels a { flex: 1; text-align: center; padding: 10px; border-radius: var(--r8); font-size: 13px; font-weight: 600; }
+.mob-wa { background: rgba(37,211,102,0.12); color: var(--wa); border: 1px solid rgba(37,211,102,0.2); }
+.mob-tg { background: rgba(42,171,238,0.12); color: var(--tg); border: 1px solid rgba(42,171,238,0.2); }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#hero {
+  position: relative; z-index: 2;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 6vw, 80px);
+  padding: clamp(90px, 12vw, 140px) clamp(20px, 5vw, 72px) clamp(60px, 8vw, 80px);
+}
+#hero::after {
+  content: '';
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent 10%, var(--rim) 40%, var(--rim) 60%, transparent 90%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  animation: upIn .8s cubic-bezier(.16,1,.3,1) both;
+}
+.eyebrow-dash { width: 28px; height: 1px; background: var(--gold); }
+.eyebrow-txt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase;
+}
+
+.hero-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(44px, 6vw, 82px);
+  font-weight: 700; line-height: 1.05;
+  letter-spacing: -1px; color: #eef4ff;
+  margin-bottom: 22px;
+  animation: upIn .8s .07s cubic-bezier(.16,1,.3,1) both;
+}
+.hero-h1 em { font-style: italic; color: var(--gold); display: block; }
+
+.hero-p {
+  font-size: clamp(14px, 1.6vw, 16px); font-weight: 300;
+  color: var(--muted); line-height: 1.85; max-width: 420px;
+  margin-bottom: 40px;
+  animation: upIn .8s .14s cubic-bezier(.16,1,.3,1) both;
+}
+
+.hero-btns {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  animation: upIn .8s .21s cubic-bezier(.16,1,.3,1) both;
+}
+.btn-primary {
+  padding: 14px 30px; border-radius: var(--r8);
+  background: var(--gold); color: var(--ink);
+  font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+  border: none; cursor: pointer; transition: all 0.22s;
+  box-shadow: 0 8px 28px var(--gold-glow);
+  position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(200,164,106,0.42); }
+
+.btn-outline {
+  padding: 13px 30px; border-radius: var(--r8);
+  background: transparent; color: #ccd8ee;
+  font-size: 14px; font-weight: 500;
+  border: 1px solid var(--rim); cursor: pointer; transition: all 0.22s;
+}
+.btn-outline:hover { background: var(--rim-s); border-color: rgba(120,160,220,0.25); color: #eef4ff; }
+
+/* ── Hero Chat Card ── */
+.hero-card {
+  background: var(--card);
+  border: 1px solid var(--rim);
+  border-radius: var(--r20);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--rim-s), 0 40px 80px rgba(0,0,0,0.55), 0 0 50px rgba(78,142,247,0.04);
+  position: relative;
+  animation: cardIn 1s .18s cubic-bezier(.16,1,.3,1) both;
+}
+.hero-card::before {
+  content: '';
+  position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-lt), transparent);
+  opacity: 0.6;
+}
+
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rim-s);
+  background: rgba(255,255,255,0.015);
+}
+.card-agent { display: flex; align-items: center; gap: 10px; }
+.agent-av {
+  width: 36px; height: 36px; border-radius: var(--r8);
+  background: linear-gradient(135deg, rgba(200,164,106,0.2), rgba(78,142,247,0.15));
+  border: 1px solid var(--rim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; flex-shrink: 0;
+}
+.agent-nm { font-size: 13px; font-weight: 600; color: #dde8ff; }
+.agent-st {
+  font-size: 11px; color: #4ade80;
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.st-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: breathe 2s ease-in-out infinite; }
+@keyframes breathe { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+.card-badges { display: flex; gap: 6px; }
+.badge {
+  padding: 3px 9px; border-radius: var(--r99); font-size: 10px; font-weight: 700; letter-spacing: .3px;
+}
+.badge-wa { background: rgba(37,211,102,0.1); color: var(--wa); border: 1px solid rgba(37,211,102,0.18); }
+.badge-tg { background: rgba(42,171,238,0.1); color: var(--tg); border: 1px solid rgba(42,171,238,0.18); }
+
+/* chat messages */
+#chat-messages {
+  padding: 18px 18px 4px;
+  min-height: 240px; max-height: 240px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 12px;
+  scroll-behavior: smooth;
+}
+#chat-messages::-webkit-scrollbar { width: 4px; }
+#chat-messages::-webkit-scrollbar-track { background: transparent; }
+#chat-messages::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 2px; }
+
+.cm { display: flex; gap: 8px; animation: msgUp .35s cubic-bezier(.16,1,.3,1) both; }
+.cm.user { flex-direction: row-reverse; }
+.cm-av {
+  width: 26px; height: 26px; border-radius: var(--r8); flex-shrink: 0;
+  background: linear-gradient(135deg, var(--gold-dim), var(--azure-dim));
+  border: 1px solid var(--rim-s); display: flex; align-items: center; justify-content: center;
+  font-size: 11px; align-self: flex-end; margin-bottom: 2px;
+}
+.cm-b {
+  max-width: 82%; padding: 10px 13px; border-radius: var(--r12);
+  font-size: 13px; line-height: 1.6; font-weight: 400;
+}
+.cm.ai .cm-b {
+  background: var(--lift); border: 1px solid var(--rim-s); color: var(--txt);
+  border-radius: var(--r4) var(--r12) var(--r12) var(--r12);
+}
+.cm.user .cm-b {
+  background: linear-gradient(135deg, rgba(200,164,106,0.15), rgba(200,164,106,0.07));
+  border: 1px solid rgba(200,164,106,0.18); color: #dde8ff;
+  border-radius: var(--r12) var(--r4) var(--r12) var(--r12);
+}
+.cm-b b { color: var(--gold); font-weight: 600; }
+.cm-b a { color: var(--azure); text-decoration: underline; text-underline-offset: 2px; }
+
+.typing { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+.typing span {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--muted);
+  animation: td 1.3s ease-in-out infinite;
+}
+.typing span:nth-child(2){ animation-delay:.2s }
+.typing span:nth-child(3){ animation-delay:.4s }
+@keyframes td { 0%,80%,100%{transform:scale(.55);opacity:.3} 40%{transform:scale(1);opacity:1} }
+
+/* chat input */
+.chat-foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--rim-s);
+  background: rgba(0,0,0,0.18);
+}
+.chat-input-row {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--lift); border: 1px solid var(--rim-s);
+  border-radius: var(--r12); padding: 6px 6px 6px 14px;
+  transition: border-color 0.2s;
+}
+.chat-input-row:focus-within { border-color: rgba(200,164,106,0.3); }
+#chatInput {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-family: 'Manrope', sans-serif; font-size: 13px; color: #dde8ff;
+  caret-color: var(--gold); min-width: 0;
+}
+#chatInput::placeholder { color: var(--muted); }
+#sendBtn {
+  width: 34px; height: 34px; border-radius: var(--r8); flex-shrink: 0;
+  background: var(--gold); border: none; cursor: pointer; color: var(--ink);
+  font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+#sendBtn:hover { background: var(--gold-lt); transform: scale(1.05); }
+#sendBtn.loading { opacity: 0.6; pointer-events: none; }
+
+.chat-channels {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+.cc-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px; border-radius: var(--r8);
+  font-size: 12px; font-weight: 600; transition: all 0.2s;
+}
+.cc-wa { background: rgba(37,211,102,0.08); color: var(--wa); border: 1px solid rgba(37,211,102,0.15); }
+.cc-wa:hover { background: rgba(37,211,102,0.16); }
+.cc-tg { background: rgba(42,171,238,0.08); color: var(--tg); border: 1px solid rgba(42,171,238,0.15); }
+.cc-tg:hover { background: rgba(42,171,238,0.16); }
+
+@keyframes upIn  { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+@keyframes cardIn{ from{opacity:0;transform:translateY(28px) scale(.97)} to{opacity:1;transform:none} }
+@keyframes msgUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+/* ═══════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════ */
+#stats {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border-top: 1px solid var(--rim); border-bottom: 1px solid var(--rim);
+  background: var(--deep);
+}
+.stat {
+  padding: clamp(28px,4vw,48px) clamp(16px,3vw,40px);
+  border-right: 1px solid var(--rim);
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .55s, transform .55s;
+}
+.stat:last-child { border-right: none; }
+.stat.vis { opacity: 1; transform: none; }
+.stat-n {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px,5vw,54px); font-weight: 700;
+  color: #eef4ff; line-height: 1; margin-bottom: 5px;
+}
+.stat-n em { font-style: normal; color: var(--gold); font-size: 0.65em; vertical-align: super; }
+.stat-l { font-size: 11px; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; }
+
+/* ═══════════════════════════════════════════
+   SHARED SECTION ATOMS
+═══════════════════════════════════════════ */
+.sec {
+  position: relative; z-index: 2;
+  padding: clamp(72px,10vw,120px) clamp(20px,5vw,72px);
+}
+.sec-tag {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+}
+.sec-tag-dash { width: 28px; height: 1px; background: var(--gold); }
+.sec-tag-txt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase;
+}
+.sec-h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(34px,5vw,58px); font-weight: 700;
+  color: #eef4ff; line-height: 1.05; letter-spacing: -.5px;
+  margin-bottom: 14px;
+}
+.sec-h2 em { font-style: italic; color: var(--gold); }
+.sec-p { font-size: 15px; color: var(--muted); line-height: 1.8; max-width: 480px; margin-bottom: 56px; }
+
+/* ═══════════════════════════════════════════
+   SERVICES
+═══════════════════════════════════════════ */
+#servicios { background: var(--ink); }
+.svc-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  background: var(--rim); border: 1px solid var(--rim);
+  border-radius: var(--r16); overflow: hidden; gap: 1px;
+}
+.svc-card {
+  background: var(--card); padding: clamp(28px,4vw,48px) clamp(22px,3vw,38px);
+  position: relative; overflow: hidden;
+  opacity: 0; transform: translateY(18px);
+  transition: opacity .5s, transform .5s, background .3s;
+}
+.svc-card.vis { opacity: 1; transform: none; }
+.svc-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
+  background: var(--sc, var(--gold)); transform: scaleX(0); transform-origin: left;
+  transition: transform .4s;
+}
+.svc-card:hover::after { transform: scaleX(1); }
+.svc-card:hover { background: var(--navy); }
+.svc-card:nth-child(1){--sc:var(--gold)}
+.svc-card:nth-child(2){--sc:var(--azure)}
+.svc-card:nth-child(3){--sc:#a78bfa}
+.svc-card:nth-child(4){--sc:var(--gold)}
+.svc-card:nth-child(5){--sc:#34d399}
+.svc-card:nth-child(6){--sc:var(--azure)}
+
+.svc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--faint); letter-spacing: 2px; margin-bottom: 20px;
+}
+.svc-ico {
+  width: 50px; height: 50px; border-radius: var(--r12);
+  background: rgba(255,255,255,0.03); border: 1px solid var(--rim-s);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 20px;
+  transition: background .3s, border-color .3s;
+}
+.svc-card:hover .svc-ico { background: var(--gold-dim); border-color: rgba(200,164,106,0.2); }
+.svc-title { font-size: 17px; font-weight: 700; color: #dde8ff; margin-bottom: 10px; }
+.svc-desc { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 20px; }
+.svc-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.svc-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; padding: 3px 8px; border-radius: var(--r4);
+  background: rgba(255,255,255,0.03); border: 1px solid var(--rim-s); color: var(--muted);
+}
+
+/* ═══════════════════════════════════════════
+   PAYMENTS
+═══════════════════════════════════════════ */
+#pagos { background: var(--deep); border-top: 1px solid var(--rim); border-bottom: 1px solid var(--rim); }
+.pay-top {
+  display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px,6vw,80px); align-items: end; margin-bottom: 48px;
+}
+.gw-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+}
+.gw-card {
+  background: var(--card); border: 1px solid var(--rim-s); border-radius: var(--r12);
+  padding: 24px 16px; text-align: center;
+  opacity: 0; transform: scale(.96);
+  transition: opacity .45s, transform .45s, border-color .25s, box-shadow .25s;
+}
+.gw-card.vis { opacity: 1; transform: none; }
+.gw-card:hover { border-color: rgba(200,164,106,0.25); box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(200,164,106,0.06); }
+.gw-card::before { content: ''; position: absolute; top:0;left:0;right:0;height:1px; background: linear-gradient(to right,transparent,rgba(200,164,106,.35),transparent); opacity:0; transition:opacity .25s; }
+.gw-card:hover::before { opacity: 1; }
+.gw-card { position: relative; }
+.gw-icon { font-size: 26px; margin-bottom: 10px; }
+.gw-name { font-size: 13px; font-weight: 700; color: #ccd8ee; margin-bottom: 3px; }
+.gw-type { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: .5px; }
+
+/* ═══════════════════════════════════════════
+   CUSTOM DEV  (2-col)
+═══════════════════════════════════════════ */
+#medida { background: var(--ink); }
+.custom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px,7vw,100px); align-items: start; }
+.feat-list { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+.feat {
+  display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start;
+  padding: 20px; background: var(--card); border: 1px solid var(--rim-s); border-radius: var(--r12);
+  opacity: 0; transform: translateX(-16px); transition: opacity .5s, transform .5s, border-color .25s;
+}
+.feat.vis { opacity: 1; transform: none; }
+.feat:hover { border-color: rgba(200,164,106,0.2); }
+.feat-ico {
+  width: 44px; height: 44px; border-radius: var(--r12); flex-shrink: 0;
+  background: var(--gold-dim); border: 1px solid rgba(200,164,106,0.12);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.feat-title { font-size: 14px; font-weight: 700; color: #dde8ff; margin-bottom: 4px; }
+.feat-desc { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+.code-panel {
+  background: var(--navy); border: 1px solid var(--rim); border-radius: var(--r16); overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 40px rgba(78,142,247,0.04);
+  position: sticky; top: 80px;
+}
+.code-bar {
+  display: flex; align-items: center; gap: 8px; padding: 12px 18px;
+  border-bottom: 1px solid var(--rim-s); background: rgba(255,255,255,0.015);
+}
+.cdot { width: 11px; height: 11px; border-radius: 50%; }
+.cdot:nth-child(1){background:#ff5f57} .cdot:nth-child(2){background:#febc2e} .cdot:nth-child(3){background:#28c840}
+.code-file {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
+  margin-left: 8px; letter-spacing: .3px;
+}
+pre.code {
+  padding: 24px 22px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; line-height: 1.9; overflow-x: auto; tab-size: 2;
+}
+.tk  { color: #b48df0; } .tf  { color: #5eead4; }
+.ts  { color: #fbbf24; } .tc  { color: #2a4060; font-style: italic; }
+.tn  { color: var(--azure); } .tg  { color: var(--gold); } .tp  { color: #f472b6; }
+
+/* ═══════════════════════════════════════════
+   AI FULL SECTION
+═══════════════════════════════════════════ */
+#ai-sec {
+  background: var(--deep); border-top: 1px solid var(--rim);
+  position: relative; overflow: hidden;
+}
+#ai-sec::before {
+  content: '';
+  position: absolute; top: -250px; left: 50%; transform: translateX(-50%);
+  width: 1000px; height: 1000px;
+  background: radial-gradient(circle, rgba(200,164,106,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+.ai-center { text-align: center; }
+.ai-pulse {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 18px; border-radius: var(--r99);
+  background: var(--gold-dim); border: 1px solid rgba(200,164,106,0.18);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: breathe 2s ease-in-out infinite; }
+
+.ai-channels {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  max-width: 760px; margin: 0 auto 48px;
+}
+.ai-ch {
+  background: var(--card); border-radius: var(--r16); padding: 34px 28px;
+  text-align: left; position: relative; overflow: hidden;
+  opacity: 0; transform: translateY(18px); transition: opacity .5s, transform .5s;
+}
+.ai-ch.vis { opacity: 1; transform: none; }
+.ai-ch.wa-ch { border: 1px solid rgba(37,211,102,0.18); }
+.ai-ch.wa-ch::before { content:''; position:absolute;top:0;left:0;right:0;height:1px; background:linear-gradient(to right,transparent,rgba(37,211,102,.4),transparent); }
+.ai-ch.tg-ch { border: 1px solid rgba(42,171,238,0.18); }
+.ai-ch.tg-ch::before { content:''; position:absolute;top:0;left:0;right:0;height:1px; background:linear-gradient(to right,transparent,rgba(42,171,238,.4),transparent); }
+.ai-ch-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.ai-ch-name { font-size: 18px; font-weight: 700; color: #dde8ff; }
+.ai-ch-icon { font-size: 32px; }
+.ai-ch-desc { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 22px; }
+.btn-wa-full {
+  display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: var(--r8);
+  background: var(--wa); color: var(--ink); font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+  transition: all .22s; letter-spacing: .3px;
+}
+.btn-wa-full:hover { background: #1ebe5d; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(37,211,102,.35); }
+.btn-tg-full {
+  display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: var(--r8);
+  background: var(--tg); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+  transition: all .22s; letter-spacing: .3px;
+}
+.btn-tg-full:hover { background: #1a9fdc; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(42,171,238,.35); }
+
+.ai-perks {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+}
+.ai-perk {
+  display: flex; align-items: center; gap: 7px; padding: 9px 16px;
+  background: rgba(255,255,255,0.025); border: 1px solid var(--rim-s); border-radius: var(--r99);
+  font-size: 12px; color: var(--muted);
+}
+.ai-perk span { color: var(--gold); }
+
+/* ═══════════════════════════════════════════
+   PROCESS
+═══════════════════════════════════════════ */
+#proceso { background: var(--ink); }
+.steps { max-width: 820px; }
+.step {
+  display: grid; grid-template-columns: 60px 1fr; gap: 24px;
+  padding: 28px 0; border-bottom: 1px solid var(--rim-s);
+  align-items: start;
+  opacity: 0; transform: translateX(-18px); transition: opacity .5s, transform .5s;
+}
+.step:last-child { border-bottom: none; }
+.step.vis { opacity: 1; transform: none; }
+.step-n {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--rim);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--gold);
+  transition: border-color .3s, box-shadow .3s; flex-shrink: 0;
+}
+.step:hover .step-n { border-color: rgba(200,164,106,.35); box-shadow: 0 0 20px var(--gold-glow); }
+.step-title { font-size: 16px; font-weight: 700; color: #dde8ff; margin-bottom: 7px; }
+.step-text  { font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+/* ═══════════════════════════════════════════
+   CTA
+═══════════════════════════════════════════ */
+#cta {
+  background: var(--deep); border-top: 1px solid var(--rim);
+  position: relative; overflow: hidden; text-align: center;
+}
+#cta::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 90% at 50% 50%, rgba(200,164,106,0.05) 0%, transparent 70%);
+}
+.ring { position: absolute; border-radius: 50%; border: 1px solid var(--rim-s); top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+.ring1{width:360px;height:360px} .ring2{width:640px;height:640px;opacity:.6} .ring3{width:920px;height:920px;opacity:.3}
+.cta-inner { position: relative; z-index: 1; }
+.cta-h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(44px,7vw,82px); font-weight: 700;
+  color: #eef4ff; line-height: .96; letter-spacing: -2px; margin-bottom: 18px;
+}
+.cta-h2 em { font-style: italic; color: var(--gold); }
+.cta-p { font-size: 16px; color: var(--muted); margin-bottom: 44px; line-height: 1.65; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  background: var(--navy); border-top: 1px solid var(--rim);
+  padding: clamp(32px,5vw,52px) clamp(20px,5vw,72px);
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px;
+  position: relative; z-index: 2;
+}
+.foot-copy { font-size: 11px; color: var(--muted); text-align: center; }
+.foot-links { display: flex; gap: 24px; justify-content: flex-end; }
+.foot-links a { font-size: 11px; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; transition: color .2s; }
+.foot-links a:hover { color: var(--gold); }
+
+/* ═══════════════════════════════════════════
+   FLOAT BUTTONS
+═══════════════════════════════════════════ */
+#floaters {
+  position: fixed; bottom: 24px; right: 20px; z-index: 600;
+  display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+}
+.fl-wrap { position: relative; display: flex; align-items: center; gap: 10px; }
+.fl-tip {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  background: var(--card); border: 1px solid var(--rim); color: var(--txt);
+  padding: 5px 11px; border-radius: var(--r8); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+  letter-spacing: .5px;
+}
+.fl-wrap:hover .fl-tip { opacity: 1; }
+.fl-btn {
+  width: 48px; height: 48px; border-radius: var(--r12); border: none; cursor: pointer;
+  font-size: 20px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 22px rgba(0,0,0,.35); transition: transform .2s, box-shadow .2s;
+}
+.fl-btn:hover { transform: scale(1.1); box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.fl-wa { background: #25d366; }
+.fl-tg { background: #2aabee; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — TABLET
+═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  #nav .nav-links, #nav .btn-cta, #nav .pill { display: none; }
+  #hamburger { display: flex; }
+  #hero { grid-template-columns: 1fr; padding-top: 88px; gap: 40px; }
+  #hero::after { display: none; }
+  .hero-h1 { font-size: clamp(38px,8vw,60px); }
+  .svc-grid { grid-template-columns: 1fr 1fr; }
+  .custom-grid { grid-template-columns: 1fr; }
+  .code-panel { position: static; }
+  .pay-top { grid-template-columns: 1fr; gap: 20px; }
+  .ai-channels { grid-template-columns: 1fr; max-width: 440px; }
+  footer { grid-template-columns: 1fr; text-align: center; }
+  .foot-links { justify-content: center; }
+  #stats { grid-template-columns: repeat(2,1fr); }
+  .stat:nth-child(2) { border-right: none; }
+  .stat:nth-child(1),.stat:nth-child(2) { border-bottom: 1px solid var(--rim); }
+}
+/* ── MOBILE ── */
+@media (max-width: 640px) {
+  .svc-grid { grid-template-columns: 1fr; }
+  .gw-grid  { grid-template-columns: repeat(2,1fr); }
+  .cta-btns { flex-direction: column; align-items: center; }
+  .ai-perks { gap: 8px; }
+  .hero-btns { flex-direction: column; }
+  .btn-primary,.btn-outline { text-align: center; width: 100%; }
+  .sec-p { margin-bottom: 36px; }
+  pre.code { font-size: 10.5px; }
+  #floaters { bottom: 16px; right: 14px; }
+  .fl-tip { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="bg-mesh"></div>
+<div id="bg-dots"></div>
+
+<!-- ═══ FLOATERS ═══ -->
+<div id="floaters">
+  <div class="fl-wrap">
+    <span class="fl-tip">WhatsApp AI</span>
+    <button class="fl-btn fl-wa" onclick="window.open('https://wa.me/TUNUMERO','_blank')" aria-label="WhatsApp">💬</button>
+  </div>
+  <div class="fl-wrap">
+    <span class="fl-tip">Telegram Bot</span>
+    <button class="fl-btn fl-tg" onclick="window.open('https://t.me/TUBOT','_blank')" aria-label="Telegram">✈</button>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav id="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">N</div>
+    <span class="nav-logo-name">NEX<span>DEV</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#pagos">Pasarelas</a></li>
+    <li><a href="#medida">A la medida</a></li>
+    <li><a href="#ai-sec">Agente IA</a></li>
+  </ul>
+  <div class="nav-end">
+    <a href="https://wa.me/TUNUMERO" class="pill pill-wa" target="_blank">💬 WhatsApp</a>
+    <a href="https://t.me/TUBOT" class="pill pill-tg" target="_blank">✈ Telegram</a>
+    <button class="btn-cta" onclick="document.getElementById('ai-sec').scrollIntoView({behavior:'smooth'})">Consultar Ahora</button>
+  </div>
+  <button id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu">
+  <a href="#servicios">Servicios</a>
+  <a href="#pagos">Pasarelas de pago</a>
+  <a href="#medida">Desarrollo a la medida</a>
+  <a href="#ai-sec">Agente IA</a>
+  <a href="#proceso">Proceso</a>
+  <div class="mob-channels">
+    <a href="https://wa.me/TUNUMERO" class="mob-wa" target="_blank">💬 WhatsApp</a>
+    <a href="https://t.me/TUBOT" class="mob-tg" target="_blank">✈ Telegram</a>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div>
+    <div class="hero-eyebrow">
+      <div class="eyebrow-dash"></div>
+      <span class="eyebrow-txt">Ingeniería Digital de Élite</span>
+    </div>
+    <h1 class="hero-h1">
+      Código que construye<br>
+      <em>negocios reales.</em>
+    </h1>
+    <p class="hero-p">WordPress, Laravel, integraciones, pasarelas de pago y soluciones completamente a la medida. Con un agente IA disponible 24/7 para atenderte al instante.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('ai-sec').scrollIntoView({behavior:'smooth'})">Hablar con el Agente IA ✦</button>
+      <button class="btn-outline" onclick="document.getElementById('servicios').scrollIntoView({behavior:'smooth'})">Ver Servicios</button>
+    </div>
+  </div>
+
+  <!-- Interactive AI Chat -->
+  <div class="hero-card">
+    <div class="card-header">
+      <div class="card-agent">
+        <div class="agent-av">✦</div>
+        <div>
+          <div class="agent-nm">Nexdev Assistant</div>
+          <div class="agent-st"><div class="st-dot"></div>En línea · IA activa</div>
+        </div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-wa">WA</span>
+        <span class="badge badge-tg">TG</span>
+      </div>
+    </div>
+
+    <div id="chat-messages">
+      <div class="cm ai">
+        <div class="cm-av">✦</div>
+        <div class="cm-b">¡Hola! Soy el asistente de <b>Nexdev</b>. Puedo ayudarte a cotizar, resolver dudas técnicas o conectarte con nuestro equipo. ¿En qué proyecto estás trabajando?</div>
+      </div>
+    </div>
+
+    <div class="chat-foot">
+      <div class="chat-input-row">
+        <input id="chatInput" type="text" placeholder="Escribe tu consulta…" autocomplete="off" />
+        <button id="sendBtn" aria-label="Enviar">→</button>
+      </div>
+      <div class="chat-channels">
+        <a href="https://wa.me/TUNUMERO" class="cc-btn cc-wa" target="_blank">💬 WhatsApp</a>
+        <a href="https://t.me/TUBOT" class="cc-btn cc-tg" target="_blank">✈ Telegram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<div id="stats">
+  <div class="stat"><div class="stat-n" data-t="200"><span class="nv">0</span><em>+</em></div><div class="stat-l">Proyectos Entregados</div></div>
+  <div class="stat"><div class="stat-n" data-t="97"><span class="nv">0</span><em>%</em></div><div class="stat-l">Clientes Satisfechos</div></div>
+  <div class="stat"><div class="stat-n" data-t="12"><span class="nv">0</span><em>+</em></div><div class="stat-l">Pasarelas Integradas</div></div>
+  <div class="stat"><div class="stat-n" data-t="8"><span class="nv">0</span><em>+</em></div><div class="stat-l">Años de Experiencia</div></div>
+</div>
+
+<!-- ═══ SERVICES ═══ -->
+<section class="sec" id="servicios">
+  <div class="sec-tag"><div class="sec-tag-dash"></div><span class="sec-tag-txt">Servicios</span></div>
+  <h2 class="sec-h2">Todo lo que tu negocio<br><em>necesita crecer.</em></h2>
+  <p class="sec-p">Tecnología probada, equipos especializados, resultados medibles. Sin intermediarios.</p>
+  <div class="svc-grid">
+    <div class="svc-card"><div class="svc-num">// 01</div><div class="svc-ico">🔷</div><div class="svc-title">WordPress & WooCommerce</div><p class="svc-desc">Sitios corporativos, tiendas online y plataformas de contenido. Diseño a medida, velocidad optimizada y SEO técnico incluido.</p><div class="svc-pills"><span class="svc-pill">WooCommerce</span><span class="svc-pill">Elementor Pro</span><span class="svc-pill">ACF</span><span class="svc-pill">WP Rocket</span></div></div>
+    <div class="svc-card"><div class="svc-num">// 02</div><div class="svc-ico">⚙️</div><div class="svc-title">Laravel & PHP</div><p class="svc-desc">Aplicaciones web robustas, APIs RESTful y sistemas de gestión empresarial con arquitectura limpia y escalable.</p><div class="svc-pills"><span class="svc-pill">Laravel 11</span><span class="svc-pill">Livewire</span><span class="svc-pill">API REST</span><span class="svc-pill">MySQL</span></div></div>
+    <div class="svc-card"><div class="svc-num">// 03</div><div class="svc-ico">🔗</div><div class="svc-title">Integraciones & APIs</div><p class="svc-desc">Conectamos tus plataformas con cualquier servicio externo. CRMs, ERPs, marketplaces y sistemas de terceros via API.</p><div class="svc-pills"><span class="svc-pill">Webhooks</span><span class="svc-pill">OAuth2</span><span class="svc-pill">GraphQL</span><span class="svc-pill">Zapier</span></div></div>
+    <div class="svc-card"><div class="svc-num">// 04</div><div class="svc-ico">💳</div><div class="svc-title">Pasarelas de Pago</div><p class="svc-desc">Integración nativa con Neonet, Epay, Stripe y más. Cobros seguros, suscripciones recurrentes y multi-moneda.</p><div class="svc-pills"><span class="svc-pill">Neonet</span><span class="svc-pill">Epay</span><span class="svc-pill">Stripe</span><span class="svc-pill">PayPal</span></div></div>
+    <div class="svc-card"><div class="svc-num">// 05</div><div class="svc-ico">✦</div><div class="svc-title">IA & Automatización</div><p class="svc-desc">Agentes inteligentes para WhatsApp y Telegram, chatbots con memoria, RAG sobre documentos y automatización de procesos.</p><div class="svc-pills"><span class="svc-pill">Claude API</span><span class="svc-pill">GPT-4o</span><span class="svc-pill">n8n</span><span class="svc-pill">Bots</span></div></div>
+    <div class="svc-card"><div class="svc-num">// 06</div><div class="svc-ico">🛠</div><div class="svc-title">Desarrollo a la Medida</div><p class="svc-desc">Cuando las soluciones estándar no bastan. Arquitectura personalizada, sin plantillas, construida exactamente para tu negocio.</p><div class="svc-pills"><span class="svc-pill">React</span><span class="svc-pill">Next.js</span><span class="svc-pill">Node.js</span><span class="svc-pill">Python</span></div></div>
+  </div>
+</section>
+
+<!-- ═══ PAYMENTS ═══ -->
+<section class="sec" id="pagos" style="background:var(--deep);border-top:1px solid var(--rim);border-bottom:1px solid var(--rim)">
+  <div class="pay-top">
+    <div>
+      <div class="sec-tag"><div class="sec-tag-dash"></div><span class="sec-tag-txt">Pasarelas de Pago</span></div>
+      <h2 class="sec-h2">Cobra con cualquier<br><em>plataforma.</em></h2>
+    </div>
+    <p class="sec-p" style="margin-bottom:0">Integramos las principales soluciones de cobro del mercado local e internacional. Tu cliente paga como prefiera — tú recibes el dinero sin fricciones técnicas.</p>
+  </div>
+  <div class="gw-grid">
+    <div class="gw-card"><div class="gw-icon">🟢</div><div class="gw-name">Neonet</div><div class="gw-type">Pagos locales</div></div>
+    <div class="gw-card"><div class="gw-icon">🔵</div><div class="gw-name">Epay</div><div class="gw-type">Billetera digital</div></div>
+    <div class="gw-card"><div class="gw-icon">🟣</div><div class="gw-name">Stripe</div><div class="gw-type">Tarjetas globales</div></div>
+    <div class="gw-card"><div class="gw-icon">🟡</div><div class="gw-name">PayPal</div><div class="gw-type">Internacional</div></div>
+    <div class="gw-card"><div class="gw-icon">🔴</div><div class="gw-name">MercadoPago</div><div class="gw-type">LATAM</div></div>
+    <div class="gw-card"><div class="gw-icon">⚪</div><div class="gw-name">Transbank</div><div class="gw-type">WebPay Plus</div></div>
+    <div class="gw-card"><div class="gw-icon">🟤</div><div class="gw-name">Khipu</div><div class="gw-type">Transferencia</div></div>
+    <div class="gw-card"><div class="gw-icon">⚡</div><div class="gw-name">API Propia</div><div class="gw-type">Personalizada</div></div>
+  </div>
+</section>
+
+<!-- ═══ CUSTOM DEV ═══ -->
+<section class="sec" id="medida">
+  <div class="custom-grid">
+    <div>
+      <div class="sec-tag"><div class="sec-tag-dash"></div><span class="sec-tag-txt">Desarrollo a la Medida</span></div>
+      <h2 class="sec-h2">Tu visión,<br>nuestro <em>código.</em></h2>
+      <p class="sec-p">Sin plantillas. Sin compromisos. La arquitectura exacta que tu negocio necesita para operar y escalar sin límites.</p>
+      <div class="feat-list">
+        <div class="feat"><div class="feat-ico">🏗️</div><div><div class="feat-title">Arquitectura Escalable</div><div class="feat-desc">Diseñamos la base técnica correcta desde el día uno. Sin deuda técnica, sin atajos.</div></div></div>
+        <div class="feat"><div class="feat-ico">🔄</div><div><div class="feat-title">CRM & ERP a la Medida</div><div class="feat-desc">Plataformas internas de gestión, facturación y control construidas para tus procesos únicos.</div></div></div>
+        <div class="feat"><div class="feat-ico">📱</div><div><div class="feat-title">Apps Web & Mobile</div><div class="feat-desc">Aplicaciones progresivas, React Native y Flutter para cualquier dispositivo y plataforma.</div></div></div>
+        <div class="feat"><div class="feat-ico">🔌</div><div><div class="feat-title">Integraciones Complejas</div><div class="feat-desc">Conectamos sistemas legados con APIs modernas. Sincronización sin pérdida de datos.</div></div></div>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="code-bar">
+        <span class="cdot"></span><span class="cdot"></span><span class="cdot"></span>
+        <span class="code-file">PaymentGateway.php</span>
+      </div>
+      <pre class="code"><span class="tc">// Nexdev · Multi-Gateway Payment Router</span>
+<span class="tc">// Neonet + Epay + Stripe  ·  v4.1</span>
+
+<span class="tk">namespace</span> <span class="tf">Nexdev\Payments</span>;
+
+<span class="tk">readonly class</span> <span class="tg">GatewayRouter</span>
+{
+  <span class="tk">public function</span> <span class="tf">__construct</span>(
+    <span class="tk">private</span> <span class="tf">array</span> <span class="tp">$drivers</span> = [
+      <span class="ts">'neonet'</span> => <span class="tg">NeonetDriver</span>::class,
+      <span class="ts">'epay'</span>   => <span class="tg">EpayDriver</span>::class,
+      <span class="ts">'stripe'</span> => <span class="tg">StripeDriver</span>::class,
+    ]
+  ) {}
+
+  <span class="tk">public function</span> <span class="tf">charge</span>(
+    <span class="tk">string</span> <span class="tp">$gateway</span>,
+    <span class="tg">Money</span>  <span class="tp">$amount</span>,
+    <span class="tg">Customer</span> <span class="tp">$customer</span>,
+  ): <span class="tg">PaymentResult</span> {
+
+    <span class="tp">$driver</span> = <span class="tk">new</span> <span class="tp">$this</span>-><span class="tp">drivers</span>[<span class="tp">$gateway</span>];
+    <span class="tp">$result</span> = <span class="tp">$driver</span>-><span class="tf">process</span>(<span class="tp">$amount</span>, <span class="tp">$customer</span>);
+
+    <span class="tk">if</span> (<span class="tp">$result</span>-><span class="tf">successful</span>()) {
+      <span class="tg">Invoice</span>::<span class="tf">issue</span>(<span class="tp">$result</span>);
+      <span class="tg">Event</span>::<span class="tf">dispatch</span>(<span class="tk">new</span> <span class="tg">PaymentCompleted</span>(<span class="tp">$result</span>));
+    }
+
+    <span class="tk">return</span> <span class="tp">$result</span>;
+  }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AI SECTION ═══ -->
+<section class="sec" id="ai-sec">
+  <div class="ai-center">
+    <div class="ai-pulse"><div class="ai-dot"></div>Agente IA 24 / 7</div>
+    <h2 class="sec-h2" style="margin-bottom:14px">Tu negocio,<br>siempre <em>disponible.</em></h2>
+    <p class="sec-p" style="margin-inline:auto;text-align:center;margin-bottom:48px">Nuestro asistente inteligente entiende lenguaje natural, cotiza proyectos, responde dudas técnicas y agenda reuniones — en WhatsApp o Telegram, al instante.</p>
+    <div class="ai-channels">
+      <div class="ai-ch wa-ch">
+        <div class="ai-ch-head"><div class="ai-ch-name">WhatsApp</div><div class="ai-ch-icon">💬</div></div>
+        <p class="ai-ch-desc">Chatea con nuestro agente IA directamente en WhatsApp. Respuestas inmediatas sobre servicios, precios y tiempos de entrega, en cualquier momento.</p>
+        <a href="https://wa.me/TUNUMERO?text=Hola,%20quiero%20información%20sobre%20sus%20servicios" target="_blank"><button class="btn-wa-full">Iniciar Chat →</button></a>
+      </div>
+      <div class="ai-ch tg-ch">
+        <div class="ai-ch-head"><div class="ai-ch-name">Telegram</div><div class="ai-ch-icon">✈️</div></div>
+        <p class="ai-ch-desc">Bot inteligente en Telegram para consultas técnicas, seguimiento de proyectos activos y soporte rápido sin horarios ni esperas.</p>
+        <a href="https://t.me/TUBOT" target="_blank"><button class="btn-tg-full">Abrir Bot →</button></a>
+      </div>
+    </div>
+    <div class="ai-perks">
+      <div class="ai-perk"><span>✦</span> Responde en segundos</div>
+      <div class="ai-perk"><span>✦</span> Cotizaciones automáticas</div>
+      <div class="ai-perk"><span>✦</span> Soporte técnico básico</div>
+      <div class="ai-perk"><span>✦</span> Agenda reuniones</div>
+      <div class="ai-perk"><span>✦</span> Disponible 24/7</div>
+      <div class="ai-perk"><span>✦</span> Lenguaje natural</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROCESS ═══ -->
+<section class="sec" id="proceso" style="border-top:1px solid var(--rim)">
+  <div class="sec-tag"><div class="sec-tag-dash"></div><span class="sec-tag-txt">Cómo Trabajamos</span></div>
+  <h2 class="sec-h2" style="margin-bottom:14px">Del concepto<br>al <em>lanzamiento.</em></h2>
+  <p class="sec-p">Transparencia total. Sabes exactamente qué ocurre en cada etapa.</p>
+  <div class="steps">
+    <div class="step"><div class="step-n">I</div><div><div class="step-title">Briefing & Descubrimiento</div><p class="step-text">Analizamos objetivos de negocio, infraestructura actual y restricciones técnicas. Definimos el alcance real antes de cotizar.</p></div></div>
+    <div class="step"><div class="step-n">II</div><div><div class="step-title">Arquitectura & Propuesta</div><p class="step-text">Diseñamos la arquitectura técnica ideal, presentamos una cotización detallada con cronograma y definimos entregables por etapa.</p></div></div>
+    <div class="step"><div class="step-n">III</div><div><div class="step-title">Diseño UI/UX</div><p class="step-text">Wireframes de alta fidelidad y diseño visual completo antes de escribir una sola línea de código. Iteramos hasta que sea perfecto.</p></div></div>
+    <div class="step"><div class="step-n">IV</div><div><div class="step-title">Desarrollo en Sprints</div><p class="step-text">Entregas parciales semanales. Revisiones constantes para asegurar que el producto evoluciona exactamente como se planificó.</p></div></div>
+    <div class="step"><div class="step-n">V</div><div><div class="step-title">Lanzamiento & Soporte</div><p class="step-text">Deploy con QA exhaustivo, monitoreo activo post-lanzamiento y soporte continuo mientras tu negocio sigue creciendo.</p></div></div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="sec" id="cta">
+  <div class="ring ring1"></div><div class="ring ring2"></div><div class="ring ring3"></div>
+  <div class="cta-inner">
+    <div class="hero-eyebrow" style="justify-content:center;margin-bottom:22px">
+      <div class="eyebrow-dash"></div><span class="eyebrow-txt">Hablemos</span><div class="eyebrow-dash" style="background:linear-gradient(to left,transparent,var(--gold))"></div>
+    </div>
+    <h2 class="cta-h2">¿Tienes un<br><em>proyecto</em> en mente?</h2>
+    <p class="cta-p">Primera consultoría gratuita. Sin formularios, sin esperas.</p>
+    <div class="cta-btns">
+      <a href="https://wa.me/TUNUMERO?text=Hola,%20quiero%20cotizar%20un%20proyecto" target="_blank"><button class="btn-primary">💬 WhatsApp Ahora</button></a>
+      <a href="https://t.me/TUBOT" target="_blank"><button class="btn-outline">✈ Telegram Bot</button></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="nav-logo"><div class="nav-logo-mark">N</div><span class="nav-logo-name">NEX<span>DEV</span></span></div>
+  <div class="foot-copy">© 2025 Nexdev. Ingeniería Digital de Élite.</div>
+  <div class="foot-links">
+    <a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Blog</a><a href="#">Contacto</a>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script>
+/* ── Hamburger ── */
+const ham = document.getElementById('hamburger');
+const mob = document.getElementById('mobile-menu');
+ham.addEventListener('click', () => {
+  ham.classList.toggle('open');
+  mob.classList.toggle('open');
+});
+mob.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  ham.classList.remove('open'); mob.classList.remove('open');
+}));
+
+/* ── Scroll animations ── */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => { if (e.isIntersecting) setTimeout(() => e.target.classList.add('vis'), i * 75); });
+}, { threshold: 0.07 });
+document.querySelectorAll('.svc-card,.gw-card,.feat,.step,.ai-ch,.stat').forEach(el => io.observe(el));
+
+/* ── Stats counter ── */
+const sio = new IntersectionObserver(entries => {
+  if (!entries[0].isIntersecting) return;
+  document.querySelectorAll('.stat').forEach(s => {
+    const t = +s.querySelector('[data-t]').dataset.t;
+    const el = s.querySelector('.nv');
+    let start = null;
+    (function run(ts) {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / 1800, 1);
+      const e = 1 - Math.pow(1 - p, 4);
+      el.textContent = Math.floor(e * t);
+      if (p < 1) requestAnimationFrame(run);
+    })(0);
+    requestAnimationFrame(ts => {
+      let start2 = null;
+      (function run2(ts) {
+        if (!start2) start2 = ts;
+        const p = Math.min((ts - start2) / 1800, 1);
+        const e = 1 - Math.pow(1 - p, 4);
+        el.textContent = Math.floor(e * t);
+        if (p < 1) requestAnimationFrame(run2);
+      })(ts);
+    });
+  });
+  sio.disconnect();
+}, { threshold: 0.4 });
+sio.observe(document.getElementById('stats'));
+
+/* ══════════════════════════════════════════
+   AI CHAT — Conectado a Claude API Real
+══════════════════════════════════════════ */
+const SYSTEM_PROMPT = `Eres el asistente virtual de Nexdev, una agencia de desarrollo digital de élite especializada en:
+- WordPress y WooCommerce (sitios corporativos, tiendas online, e-commerce)
+- Laravel y PHP (aplicaciones web, APIs RESTful, sistemas empresariales)
+- Integraciones y APIs (CRMs, ERPs, automatizaciones con Zapier/n8n)
+- Pasarelas de pago: Neonet, Epay, Stripe, PayPal, MercadoPago, Transbank, Khipu
+- Desarrollo a la medida (React, Next.js, Node.js, Python)
+- IA y automatización (agentes con Claude API, GPT-4o, chatbots WhatsApp/Telegram)
+
+Tu personalidad:
+- Profesional, cercano y directo. Hablas en español.
+- Respondes de forma concisa (máximo 3-4 oraciones).
+- Cuando alguien pregunta por precios o quiere cotizar, les dices que el equipo puede preparar una propuesta y los invitas a continuar la conversación por WhatsApp (+56 9 XXXX XXXX) o Telegram (@nexdev_bot).
+- No inventas precios exactos. Puedes decir rangos aproximados: WordPress desde $500 USD, Laravel desde $1,200 USD, integraciones desde $300 USD.
+- Si no sabes algo específico, lo reconoces y derivas al equipo humano.
+- Nunca menciones que eres Claude o que usas la API de Anthropic. Solo di que eres el asistente de Nexdev.
+- Usa negrita con ** para destacar nombres clave cuando sea útil.`;
+
+const messages = [];
+
+function addMessage(role, html, isTyping = false) {
+  const area = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'cm ' + role;
+  if (role === 'ai') {
+    div.innerHTML = `<div class="cm-av">✦</div><div class="cm-b">${isTyping ? '<div class="typing"><span></span><span></span><span></span></div>' : html}</div>`;
+  } else {
+    div.innerHTML = `<div class="cm-b">${html}</div>`;
+  }
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+function mdToHtml(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code style="font-family:JetBrains Mono,monospace;font-size:11px;background:rgba(200,164,106,0.1);padding:1px 5px;border-radius:3px;color:var(--gold)">$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('sendBtn');
+  const text = input.value.trim();
+  if (!text || btn.classList.contains('loading')) return;
+
+  input.value = '';
+  btn.classList.add('loading');
+  btn.textContent = '…';
+
+  addMessage('user', text);
+  messages.push({ role: 'user', content: text });
+
+  const typingDiv = addMessage('ai', '', true);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: messages
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Lo siento, hubo un error. Por favor escríbenos directamente por WhatsApp.';
+
+    messages.push({ role: 'assistant', content: reply });
+    typingDiv.querySelector('.cm-b').innerHTML = mdToHtml(reply);
+
+  } catch (err) {
+    typingDiv.querySelector('.cm-b').innerHTML = 'Hubo un problema de conexión. Puedes escribirnos directamente por <a href="https://wa.me/TUNUMERO">WhatsApp</a>.';
+  }
+
+  btn.classList.remove('loading');
+  btn.textContent = '→';
+  document.getElementById('chat-messages').scrollTop = 9999;
+}
+
+document.getElementById('sendBtn').addEventListener('click', sendMessage);
+document.getElementById('chatInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+/* ── Greeting delay ── */
+setTimeout(() => {
+  addMessage('ai', '¿Te puedo ayudar con algo específico? Por ejemplo, puedo orientarte sobre <b>WordPress</b>, <b>Laravel</b>, integración de <b>pasarelas de pago</b> o <b>desarrollo a la medida</b>. 👋');
+}, 2800);
+</script>
+</body>
+</html>
