@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>NEXDEV — Ingeniería Digital de Alto Rendimiento</title>
+<title>SAMDEV — Ingeniería Digital de Alto Rendimiento</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
@@ -817,7 +817,7 @@ footer {
       <div class="card-agent">
         <div class="agent-av">✦</div>
         <div>
-          <div class="agent-nm">Nexdev Assistant</div>
+          <div class="agent-nm">SAMDEV Assistant</div>
           <div class="agent-st"><div class="st-dot"></div>En línea · IA activa</div>
         </div>
       </div>
@@ -830,7 +830,7 @@ footer {
     <div id="chat-messages">
       <div class="cm ai">
         <div class="cm-av">✦</div>
-        <div class="cm-b">¡Hola! Soy el asistente de <b>Nexdev</b>. Puedo ayudarte a cotizar, resolver dudas técnicas o conectarte con nuestro equipo. ¿En qué proyecto estás trabajando?</div>
+        <div class="cm-b">¡Hola! Soy el asistente de <b>SAMDEV</b>. Puedo ayudarte a cotizar, resolver dudas técnicas o conectarte con nuestro equipo. ¿En qué proyecto estás trabajando?</div>
       </div>
     </div>
 
@@ -910,10 +910,10 @@ footer {
         <span class="cdot"></span><span class="cdot"></span><span class="cdot"></span>
         <span class="code-file">PaymentGateway.php</span>
       </div>
-      <pre class="code"><span class="tc">// Nexdev · Multi-Gateway Payment Router</span>
+      <pre class="code"><span class="tc">// SAMDEV · Multi-Gateway Payment Router</span>
 <span class="tc">// Neonet + Epay + Stripe  ·  v4.1</span>
 
-<span class="tk">namespace</span> <span class="tf">Nexdev\Payments</span>;
+<span class="tk">namespace</span> <span class="tf">SAMDEV\Payments</span>;
 
 <span class="tk">readonly class</span> <span class="tg">GatewayRouter</span>
 {
@@ -1008,7 +1008,7 @@ footer {
 <!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="nav-logo"><div class="nav-logo-mark">N</div><span class="nav-logo-name">NEX<span>DEV</span></span></div>
-  <div class="foot-copy">© 2025 Nexdev. Ingeniería Digital de Élite.</div>
+  <div class="foot-copy">© 2025 SAMDEV. Ingeniería Digital de Élite.</div>
   <div class="foot-links">
     <a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Blog</a><a href="#">Contacto</a>
   </div>
@@ -1067,7 +1067,7 @@ sio.observe(document.getElementById('stats'));
 /* ══════════════════════════════════════════
    AI CHAT — Conectado a Claude API Real
 ══════════════════════════════════════════ */
-const SYSTEM_PROMPT = `Eres el asistente virtual de Nexdev, una agencia de desarrollo digital de élite especializada en:
+const SYSTEM_PROMPT = `Eres el asistente virtual de SAMDEV, una agencia de desarrollo digital de élite especializada en:
 - WordPress y WooCommerce (sitios corporativos, tiendas online, e-commerce)
 - Laravel y PHP (aplicaciones web, APIs RESTful, sistemas empresariales)
 - Integraciones y APIs (CRMs, ERPs, automatizaciones con Zapier/n8n)
@@ -1078,10 +1078,10 @@ const SYSTEM_PROMPT = `Eres el asistente virtual de Nexdev, una agencia de desar
 Tu personalidad:
 - Profesional, cercano y directo. Hablas en español.
 - Respondes de forma concisa (máximo 3-4 oraciones).
-- Cuando alguien pregunta por precios o quiere cotizar, les dices que el equipo puede preparar una propuesta y los invitas a continuar la conversación por WhatsApp (+56 9 XXXX XXXX) o Telegram (@nexdev_bot).
+- Cuando alguien pregunta por precios o quiere cotizar, les dices que el equipo puede preparar una propuesta y los invitas a continuar la conversación por WhatsApp (+56 9 XXXX XXXX) o Telegram (@SAMDEV_bot).
 - No inventas precios exactos. Puedes decir rangos aproximados: WordPress desde $500 USD, Laravel desde $1,200 USD, integraciones desde $300 USD.
 - Si no sabes algo específico, lo reconoces y derivas al equipo humano.
-- Nunca menciones que eres Claude o que usas la API de Anthropic. Solo di que eres el asistente de Nexdev.
+- Nunca menciones que eres Claude o que usas la API de Anthropic. Solo di que eres el asistente de SAMDEV.
 - Usa negrita con ** para destacar nombres clave cuando sea útil.`;
 
 const messages = [];
@@ -1142,7 +1142,7 @@ async function sendMessage() {
     typingDiv.querySelector('.cm-b').innerHTML = mdToHtml(reply);
 
   } catch (err) {
-    typingDiv.querySelector('.cm-b').innerHTML = 'Hubo un problema de conexión. Puedes escribirnos directamente por <a href="https://wa.me/TUNUMERO">WhatsApp</a>.';
+    typingDiv.querySelector('.cm-b').innerHTML = 'Hubo un problema de conexión. Puedes escribirnos directamente por <a href="https://wa.me/+50230178181">WhatsApp</a>.';
   }
 
   btn.classList.remove('loading');
